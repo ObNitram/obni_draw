@@ -1,0 +1,6 @@
+[submodule "packages/obni_utils"]
+	path = packages/obni_utils
+	url = https://github.com/ObNitram/obni_utils.git
+[submodule "packages/log_tanker"]
+	path = packages/log_tanker
+	url = https://github.com/ObNitram/log_tanker.git
