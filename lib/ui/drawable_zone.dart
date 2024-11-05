@@ -1,7 +1,7 @@
 import "package:flutter/widgets.dart";
-import "package:obni_draw/ui/drawable/drawable.dart";
-import "package:obni_draw/ui/drawable/drawable_rect.dart";
-import "package:obni_draw/ui/drawable/drawable_type.dart";
+import "package:obni_draw/ui/drawable_display_zone.dart";
+import "package:obni_draw/ui/drawable_type/drawable_rect_type.dart";
+import "package:obni_draw/ui/drawable_type/drawable_type.dart";
 
 class DrawableZone extends StatefulWidget {
   const DrawableZone({super.key});
@@ -12,14 +12,16 @@ class DrawableZone extends StatefulWidget {
 
 class _DrawableZoneState extends State<DrawableZone> {
   final List<IDrawableType> allDrawableType = [
-    DrawableRectType(),
-    DrawableRectType(color: const Color(0xFF00FF00)),
+    DrawableRectType(
+        backgroundColor: const Color(0x00ffffff),
+        borderColor: const Color(0xFF000000)),
+    DrawableRectType(
+        backgroundColor: const Color(0x2E625959),
+        borderColor: const Color(0xFF7A141B)),
   ];
-  late IDrawableType _currentDrawableType = allDrawableType.first;
 
-  late DrawableHandler _currentDrawable =
-      DrawableHandler(drawable: _currentDrawableType.createDrawable());
-  final List<DrawableHandler> _allPositionedDrawable = [];
+  late IDrawableType _currentDrawableType = allDrawableType.first;
+  final DrawableDisplayZone _drawableDisplayZone = DrawableDisplayZone();
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +40,6 @@ class _DrawableZoneState extends State<DrawableZone> {
                       onTap: () {
                         setState(() {
                           _currentDrawableType = allDrawableType[index];
-                          _currentDrawable = DrawableHandler(
-                              drawable: _currentDrawableType.createDrawable());
                         });
                       },
                       child: Text("Drawable  $index"),
@@ -52,28 +52,25 @@ class _DrawableZoneState extends State<DrawableZone> {
               behavior: HitTestBehavior.translucent,
               onPointerDown: (event) {
                 setState(() {
-                  if (_currentDrawable.onPointerDown(event)) {
-                    _allPositionedDrawable.add(_currentDrawable);
-                    _currentDrawable = DrawableHandler(
-                        drawable: _currentDrawableType.createDrawable());
+                  if (_currentDrawableType.onPointerDown(event)) {
+                    _drawableDisplayZone
+                        .add(_currentDrawableType.createDrawable());
                   }
                 });
               },
               onPointerMove: (event) {
                 setState(() {
-                  if (_currentDrawable.onPointerMove(event)) {
-                    _allPositionedDrawable.add(_currentDrawable);
-                    _currentDrawable = DrawableHandler(
-                        drawable: _currentDrawableType.createDrawable());
+                  if (_currentDrawableType.onPointerMove(event)) {
+                    _drawableDisplayZone
+                        .add(_currentDrawableType.createDrawable());
                   }
                 });
               },
               onPointerUp: (event) {
                 setState(() {
-                  if (_currentDrawable.onPointerUp(event)) {
-                    _allPositionedDrawable.add(_currentDrawable);
-                    _currentDrawable = DrawableHandler(
-                        drawable: _currentDrawableType.createDrawable());
+                  if (_currentDrawableType.onPointerUp(event)) {
+                    _drawableDisplayZone
+                        .add(_currentDrawableType.createDrawable());
                   }
                 });
               },
@@ -81,8 +78,8 @@ class _DrawableZoneState extends State<DrawableZone> {
                   color: const Color(0xFFEBEBEB),
                   child: Stack(
                     children: [
-                      ..._allPositionedDrawable.map((e) => e.build(context)),
-                      _currentDrawable.build(context),
+                      ..._drawableDisplayZone.getPositioned(),
+                      _currentDrawableType.draw(),
                     ],
                   ))),
         ),
