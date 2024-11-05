@@ -3,8 +3,6 @@ import "package:obni_draw/ui/drawable/drawable.dart";
 import "package:obni_draw/ui/drawable/drawable_rect.dart";
 import "package:obni_draw/ui/drawable/drawable_type.dart";
 
-
-
 class DrawableZone extends StatefulWidget {
   const DrawableZone({super.key});
 
@@ -25,7 +23,6 @@ class _DrawableZoneState extends State<DrawableZone> {
 
   @override
   Widget build(BuildContext context) {
-
     return Column(
       children: [
         Expanded(

@@ -1,7 +1,7 @@
 import "package:flutter/material.dart";
 import "package:obni_draw/ui/drawable_zone.dart";
 
-void main() { 
+void main() {
   runApp(const MyApp());
 }
 
