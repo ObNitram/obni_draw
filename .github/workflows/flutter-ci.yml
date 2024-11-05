@@ -46,6 +46,9 @@ jobs:
       - name: Run tests
         run: flutter test
 
+      - name: Build web
+        run: flutter build web
+
       # Step 5: Generate the GitHub Pages content
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
