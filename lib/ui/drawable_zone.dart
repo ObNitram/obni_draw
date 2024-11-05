@@ -1,10 +1,9 @@
 import "package:flutter/widgets.dart";
-import "package:log_tanker/log_tanker.dart";
 import "package:obni_draw/ui/drawable/drawable.dart";
 import "package:obni_draw/ui/drawable/drawable_rect.dart";
 import "package:obni_draw/ui/drawable/drawable_type.dart";
 
-Logger _logger = Logger(loggerName: "DrawableZone");
+
 
 class DrawableZone extends StatefulWidget {
   const DrawableZone({super.key});
@@ -26,7 +25,6 @@ class _DrawableZoneState extends State<DrawableZone> {
 
   @override
   Widget build(BuildContext context) {
-    _logger.v("Total positioned: ${_allPositionedDrawable.length}");
 
     return Column(
       children: [
@@ -58,7 +56,6 @@ class _DrawableZoneState extends State<DrawableZone> {
               onPointerDown: (event) {
                 setState(() {
                   if (_currentDrawable.onPointerDown(event)) {
-                    _logger.v("onPointerDown");
                     _allPositionedDrawable.add(_currentDrawable);
                     _currentDrawable = DrawableHandler(
                         drawable: _currentDrawableType.createDrawable());
@@ -68,7 +65,6 @@ class _DrawableZoneState extends State<DrawableZone> {
               onPointerMove: (event) {
                 setState(() {
                   if (_currentDrawable.onPointerMove(event)) {
-                    _logger.v("onPointerMove");
                     _allPositionedDrawable.add(_currentDrawable);
                     _currentDrawable = DrawableHandler(
                         drawable: _currentDrawableType.createDrawable());
@@ -78,7 +74,6 @@ class _DrawableZoneState extends State<DrawableZone> {
               onPointerUp: (event) {
                 setState(() {
                   if (_currentDrawable.onPointerUp(event)) {
-                    _logger.v("onPointerUp");
                     _allPositionedDrawable.add(_currentDrawable);
                     _currentDrawable = DrawableHandler(
                         drawable: _currentDrawableType.createDrawable());
