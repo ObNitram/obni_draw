@@ -66,6 +66,8 @@ class _DrawableZoneState extends State<DrawableZone> {
                     _currentDrawable = DrawableHandler(
                         drawable: _currentDrawableType.createDrawable());
                   }
+
+
                 });
               },
               onPointerUp: (event) {
