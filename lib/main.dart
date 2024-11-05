@@ -12,11 +12,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-
-
-
-
-
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.purpleAccent),
       ),
       home: const Scaffold(body: DrawableZone()),
