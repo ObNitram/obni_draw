@@ -42,7 +42,7 @@ class _DrawableZoneState extends State<DrawableZone> {
                               drawable: _currentDrawableType.createDrawable());
                         });
                       },
-                      child: Text("Drawable $index"),
+                      child: Text("Drawable  $index"),
                     ));
               }),
         ),
