@@ -44,18 +44,21 @@ class _ActionsBarState extends State<ActionsBar> {
 
           return GestureDetector(
             onTap: () => changeDrawableType(index),
-            child: Container(
-              margin: const EdgeInsets.all(margin / 2),
-              width: caseSize,
-              height: caseSize,
-              decoration: BoxDecoration(
-                color:
-                    drawableType == widget.drawableTypeState.currentDrawableType
-                        ? Color(0xFFe0dfff)
-                        : Color(0xFFFFFFFF),
-                borderRadius: BorderRadius.circular(10),
+            child: Tooltip(
+              message: drawableType.name,
+              child: Container(
+                margin: const EdgeInsets.all(margin / 2),
+                width: caseSize,
+                height: caseSize,
+                decoration: BoxDecoration(
+                  color: drawableType ==
+                          widget.drawableTypeState.currentDrawableType
+                      ? Color(0xFFe0dfff)
+                      : Color(0xFFFFFFFF),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(drawableType.icon),
               ),
-              child: Icon(drawableType.icon),
             ),
           );
         },
