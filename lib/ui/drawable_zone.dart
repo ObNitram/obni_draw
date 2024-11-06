@@ -9,23 +9,25 @@ class DrawableZone extends StatefulWidget {
     allDrawableType = [
       Selector(drawableDisplayZone: _drawableDisplayZone),
       DrawableRectType(
+          drawableDisplayZone: _drawableDisplayZone,
           backgroundColor: const Color(0x00ffffff),
           borderColor: const Color(0xFF000000)),
       DrawableRectType(
+          drawableDisplayZone: _drawableDisplayZone,
           backgroundColor: const Color(0x2E625959),
           borderColor: const Color(0xFF7A141B)),
     ];
   }
 
   final DrawableDisplayZone _drawableDisplayZone = DrawableDisplayZone();
-  late List<IDrawableType> allDrawableType;
+  late List<DrawableType> allDrawableType;
 
   @override
   State<DrawableZone> createState() => _DrawableZoneState();
 }
 
 class _DrawableZoneState extends State<DrawableZone> {
-  late IDrawableType _currentDrawableType;
+  late DrawableType _currentDrawableType;
 
   @override
   void initState() {
@@ -47,11 +49,7 @@ class _DrawableZoneState extends State<DrawableZone> {
                     width: 100,
                     height: 100,
                     child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _currentDrawableType = widget.allDrawableType[index];
-                        });
-                      },
+                      onTap: () => changeDrawableType(index),
                       child: Text("Drawable  $index"),
                     ));
               }),
@@ -61,28 +59,13 @@ class _DrawableZoneState extends State<DrawableZone> {
           child: Listener(
               behavior: HitTestBehavior.translucent,
               onPointerDown: (event) {
-                setState(() {
-                  if (_currentDrawableType.onPointerDown(event)) {
-                    widget._drawableDisplayZone
-                        .add(_currentDrawableType.createDrawable());
-                  }
-                });
+                setState(() => _currentDrawableType.onPointerDown(event));
               },
               onPointerMove: (event) {
-                setState(() {
-                  if (_currentDrawableType.onPointerMove(event)) {
-                    widget._drawableDisplayZone
-                        .add(_currentDrawableType.createDrawable());
-                  }
-                });
+                setState(() => _currentDrawableType.onPointerMove(event));
               },
               onPointerUp: (event) {
-                setState(() {
-                  if (_currentDrawableType.onPointerUp(event)) {
-                    widget._drawableDisplayZone
-                        .add(_currentDrawableType.createDrawable());
-                  }
-                });
+                setState(() => _currentDrawableType.onPointerUp(event));
               },
               child: Container(
                   color: const Color(0xFFEBEBEB),
@@ -95,5 +78,13 @@ class _DrawableZoneState extends State<DrawableZone> {
         ),
       ],
     );
+  }
+
+  void changeDrawableType(int index) {
+    setState(() {
+      _currentDrawableType.onDisable();
+      _currentDrawableType = widget.allDrawableType[index];
+      _currentDrawableType.onEnable();
+    });
   }
 }

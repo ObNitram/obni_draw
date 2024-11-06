@@ -34,6 +34,10 @@ class DrawableDisplayZone {
     _selectedDrawable = null;
   }
 
+  void deselect() {
+    _selectedDrawable = null;
+  }
+
   Positioned _build(IDrawable drawable) {
     RectTransform position = drawable.getPosition();
 

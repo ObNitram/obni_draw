@@ -1,14 +1,15 @@
 import "package:flutter/widgets.dart";
-import "package:obni_draw/ui/drawable/drawable.dart";
 
-abstract interface class IDrawableType {
-  Positioned draw();
+abstract class DrawableType {
+  Positioned draw() => Positioned(child: Container());
 
-  bool onPointerDown(PointerDownEvent event);
+  void onEnable() {}
 
-  bool onPointerMove(PointerMoveEvent event);
+  void onDisable() {}
 
-  bool onPointerUp(PointerUpEvent event);
+  void onPointerDown(PointerDownEvent event) {}
 
-  IDrawable createDrawable();
+  void onPointerMove(PointerMoveEvent event) {}
+
+  void onPointerUp(PointerUpEvent event) {}
 }
