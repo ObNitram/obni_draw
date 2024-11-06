@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import "package:obni_draw/core/position.dart";
+import "package:obni_draw/core/transform.dart";
 import "package:obni_draw/ui/drawable/drawable.dart";
 import "package:obni_draw/ui/drawable/drawable_rect.dart";
 import "package:obni_draw/ui/drawable_type/drawable_type.dart";
@@ -19,7 +19,8 @@ class DrawableRectType implements IDrawableType {
 
   @override
   Positioned draw() {
-    Rect rect = Rect.fromOffset(_startPosition, _currentPosition);
+    RectTransform rect =
+        RectTransform.fromOffset(_startPosition, _currentPosition);
 
     if (rect.area < minAreaToDisplay) {
       return Positioned(child: Container());
@@ -54,7 +55,7 @@ class DrawableRectType implements IDrawableType {
   bool onPointerUp(PointerUpEvent event) {
     _currentPosition = event.localPosition;
 
-    if (Rect.fromOffset(_startPosition, _currentPosition).area <
+    if (RectTransform.fromOffset(_startPosition, _currentPosition).area <
         minAreaToDisplay) {
       _startPosition = Offset.zero;
       _currentPosition = Offset.zero;
@@ -67,7 +68,7 @@ class DrawableRectType implements IDrawableType {
   @override
   IDrawable createDrawable() {
     return DrawableRect(
-        position: Rect.fromOffset(_startPosition, _currentPosition),
+        position: RectTransform.fromOffset(_startPosition, _currentPosition),
         borderColor: _borderColor,
         backgroundColor: _backgroundColor);
   }

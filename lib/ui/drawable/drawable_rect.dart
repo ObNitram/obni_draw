@@ -1,14 +1,14 @@
 import "package:flutter/material.dart";
-import "package:obni_draw/core/position.dart";
+import "package:obni_draw/core/transform.dart";
 import "package:obni_draw/ui/drawable/drawable.dart";
 
 class DrawableRect implements IDrawable {
-  final Rect _position;
+  final RectTransform _position;
   final Color _borderColor;
   final Color _backgroundColor;
 
   DrawableRect(
-      {required Rect position,
+      {required RectTransform position,
       required Color borderColor,
       required Color backgroundColor})
       : _position = position,
@@ -29,7 +29,7 @@ class DrawableRect implements IDrawable {
   }
 
   @override
-  Rect getPosition() {
+  RectTransform getPosition() {
     return _position;
   }
 }

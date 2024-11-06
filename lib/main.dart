@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.purpleAccent),
       ),
-      home: const Scaffold(body: DrawableZone()),
+      home: Scaffold(body: DrawableZone()),
     );
   }
 }
