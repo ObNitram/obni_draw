@@ -6,23 +6,32 @@ import "package:obni_draw/core/utils/rect_transform.dart";
 
 import "package:obni_draw/states/display_zone_state.dart";
 
-class DrawableRectType extends ActionType {
+class DrawableRectAction extends ActionType {
   final DisplayZoneState _displayZoneState;
   final Color _borderColor;
   final Color _backgroundColor;
+  final double _radius;
+  final IconData _iconData;
+  final String _name;
 
   Offset _startPosition = Offset.zero;
   Offset _currentPosition = Offset.zero;
 
   static const double minAreaToDisplay = 0.2;
 
-  DrawableRectType(
+  DrawableRectAction(
       {required Color borderColor,
       required Color backgroundColor,
-      required DisplayZoneState displayZoneState})
+      required DisplayZoneState displayZoneState,
+      required double radius,
+      required IconData iconData,
+      required String name})
       : _borderColor = borderColor,
         _backgroundColor = backgroundColor,
-        _displayZoneState = displayZoneState;
+        _displayZoneState = displayZoneState,
+        _radius = radius,
+        _iconData = iconData,
+        _name = name;
 
   @override
   Positioned draw() {
@@ -34,15 +43,12 @@ class DrawableRectType extends ActionType {
     }
 
     return rect.toPositioned(
-        child: Container(
-      decoration: BoxDecoration(
-        color: _backgroundColor,
-        border: Border.all(
-          color: _borderColor,
-          width: 2.0,
-        ),
-      ),
-    ));
+        child: DrawableRect(
+                position: RectTransform.zero,
+                borderColor: _borderColor,
+                backgroundColor: _backgroundColor,
+                radius: _radius)
+            .draw());
   }
 
   @override
@@ -74,12 +80,13 @@ class DrawableRectType extends ActionType {
     _displayZoneState.add(DrawableRect(
         position: RectTransform.fromOffset(_startPosition, _currentPosition),
         borderColor: _borderColor,
-        backgroundColor: _backgroundColor));
+        backgroundColor: _backgroundColor,
+        radius: _radius));
   }
 
   @override
-  IconData get icon => Icons.rectangle_outlined;
+  IconData get icon => _iconData;
 
   @override
-  String get name => "Rect";
+  String get name => _name;
 }

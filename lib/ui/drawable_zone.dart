@@ -1,4 +1,4 @@
-import "package:flutter/widgets.dart";
+import "package:flutter/material.dart";
 import "package:obni_draw/core/actions/draw_rect_action.dart";
 import "package:obni_draw/core/actions/selector_action.dart";
 
@@ -23,16 +23,20 @@ class _DrawableZoneState extends State<DrawableZone> {
     _drawableTypeState = ActionsState(
       allDrawableType: [
         Selector(drawableDisplayZone: _displayZoneState),
-        DrawableRectType(
-          displayZoneState: _displayZoneState,
-          backgroundColor: const Color(0x00ffffff),
-          borderColor: const Color(0xFF000000),
-        ),
-        DrawableRectType(
-          displayZoneState: _displayZoneState,
-          backgroundColor: const Color(0x2E625959),
-          borderColor: const Color(0xFF7A141B),
-        ),
+        DrawableRectAction(
+            displayZoneState: _displayZoneState,
+            backgroundColor: const Color(0x00ffffff),
+            borderColor: const Color(0xFF000000),
+            radius: 0,
+            iconData: Icons.rectangle_outlined,
+            name: "Rectangle"),
+        DrawableRectAction(
+            displayZoneState: _displayZoneState,
+            backgroundColor: const Color(0x2E625959),
+            borderColor: const Color(0xFF7A141B),
+            radius: 20,
+            iconData: Icons.rectangle_rounded,
+            name: "Rectangle Rounded"),
       ],
       onChanged: () => setState(() {}),
     );
