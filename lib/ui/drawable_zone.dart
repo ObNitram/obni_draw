@@ -1,90 +1,65 @@
 import "package:flutter/widgets.dart";
-import "package:obni_draw/ui/drawable_display_zone.dart";
-import "package:obni_draw/ui/drawable_type/drawable_rect_type.dart";
-import "package:obni_draw/ui/drawable_type/drawable_type.dart";
-import "package:obni_draw/ui/drawable_type/selector.dart";
+import "package:obni_draw/core/actions/draw_rect_action.dart";
+import "package:obni_draw/core/actions/selector_action.dart";
+
+import "package:obni_draw/states/display_zone_state.dart";
+import "package:obni_draw/ui/actions_bar.dart";
+import "package:obni_draw/states/actions_state.dart";
 
 class DrawableZone extends StatefulWidget {
   DrawableZone({super.key}) {
-    allDrawableType = [
-      Selector(drawableDisplayZone: _drawableDisplayZone),
+    _drawableTypeState = ActionsState(allDrawableType: [
+      Selector(drawableDisplayZone: _displayZoneState),
       DrawableRectType(
-          drawableDisplayZone: _drawableDisplayZone,
+          displayZoneState: _displayZoneState,
           backgroundColor: const Color(0x00ffffff),
           borderColor: const Color(0xFF000000)),
       DrawableRectType(
-          drawableDisplayZone: _drawableDisplayZone,
+          displayZoneState: _displayZoneState,
           backgroundColor: const Color(0x2E625959),
-          borderColor: const Color(0xFF7A141B)),
-    ];
+          borderColor: const Color(0xFF7A141B))
+    ], onChanged: () => createState());
   }
 
-  final DrawableDisplayZone _drawableDisplayZone = DrawableDisplayZone();
-  late List<DrawableType> allDrawableType;
+  final DisplayZoneState _displayZoneState = DisplayZoneState();
+  late ActionsState _drawableTypeState;
 
   @override
   State<DrawableZone> createState() => _DrawableZoneState();
 }
 
 class _DrawableZoneState extends State<DrawableZone> {
-  late DrawableType _currentDrawableType;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentDrawableType = widget.allDrawableType.first;
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          flex: 1,
-          child: ListView.builder(
-              itemCount: widget.allDrawableType.length,
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (context, index) {
-                return SizedBox(
-                    width: 100,
-                    height: 100,
-                    child: GestureDetector(
-                      onTap: () => changeDrawableType(index),
-                      child: Text("Drawable  $index"),
-                    ));
-              }),
-        ),
-        Expanded(
-          flex: 8,
-          child: Listener(
-              behavior: HitTestBehavior.translucent,
-              onPointerDown: (event) {
-                setState(() => _currentDrawableType.onPointerDown(event));
-              },
-              onPointerMove: (event) {
-                setState(() => _currentDrawableType.onPointerMove(event));
-              },
-              onPointerUp: (event) {
-                setState(() => _currentDrawableType.onPointerUp(event));
-              },
-              child: Container(
-                  color: const Color(0xFFEBEBEB),
-                  child: Stack(
-                    children: [
-                      ...widget._drawableDisplayZone.getPositioned(),
-                      _currentDrawableType.draw(),
-                    ],
-                  ))),
-        ),
-      ],
-    );
-  }
-
-  void changeDrawableType(int index) {
-    setState(() {
-      _currentDrawableType.onDisable();
-      _currentDrawableType = widget.allDrawableType[index];
-      _currentDrawableType.onEnable();
-    });
+    return Listener(
+        behavior: HitTestBehavior.translucent,
+        onPointerDown: (event) {
+          setState(() => widget._drawableTypeState.currentDrawableType
+              .onPointerDown(event));
+        },
+        onPointerMove: (event) {
+          setState(() => widget._drawableTypeState.currentDrawableType
+              .onPointerMove(event));
+        },
+        onPointerUp: (event) {
+          setState(() =>
+              widget._drawableTypeState.currentDrawableType.onPointerUp(event));
+        },
+        child: Container(
+            color: const Color(0xFFEBEBEB),
+            child: Stack(
+              children: [
+                ...widget._displayZoneState.getPositioned(),
+                widget._drawableTypeState.currentDrawableType.draw(),
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: ActionsBar(
+                        drawableTypeState: widget._drawableTypeState),
+                  ),
+                )
+              ],
+            )));
   }
 }

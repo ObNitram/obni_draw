@@ -1,11 +1,13 @@
 import "package:flutter/material.dart";
-import "package:obni_draw/core/transform.dart";
-import "package:obni_draw/ui/drawable/drawable_rect.dart";
-import "package:obni_draw/ui/drawable_display_zone.dart";
-import "package:obni_draw/ui/drawable_type/drawable_type.dart";
+import "package:obni_draw/core/actions/action_type.dart";
+import "package:obni_draw/core/drawable/drawable_rect.dart";
 
-class DrawableRectType extends DrawableType {
-  final DrawableDisplayZone _drawableDisplayZone;
+import "package:obni_draw/core/utils/rect_transform.dart";
+
+import "package:obni_draw/states/display_zone_state.dart";
+
+class DrawableRectType extends ActionType {
+  final DisplayZoneState _displayZoneState;
   final Color _borderColor;
   final Color _backgroundColor;
 
@@ -17,10 +19,10 @@ class DrawableRectType extends DrawableType {
   DrawableRectType(
       {required Color borderColor,
       required Color backgroundColor,
-      required DrawableDisplayZone drawableDisplayZone})
+      required DisplayZoneState displayZoneState})
       : _borderColor = borderColor,
         _backgroundColor = backgroundColor,
-        _drawableDisplayZone = drawableDisplayZone;
+        _displayZoneState = displayZoneState;
 
   @override
   Positioned draw() {
@@ -69,9 +71,15 @@ class DrawableRectType extends DrawableType {
   }
 
   void createDrawable() {
-    _drawableDisplayZone.add(DrawableRect(
+    _displayZoneState.add(DrawableRect(
         position: RectTransform.fromOffset(_startPosition, _currentPosition),
         borderColor: _borderColor,
         backgroundColor: _backgroundColor));
   }
+
+  @override
+  IconData get icon => Icons.rectangle_outlined;
+
+  @override
+  String get name => "Rect";
 }

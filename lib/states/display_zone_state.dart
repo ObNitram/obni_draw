@@ -1,18 +1,17 @@
 import "package:flutter/material.dart";
 import "package:flutter/widgets.dart";
-import "package:obni_draw/core/transform.dart";
-import "package:obni_draw/ui/slected_indicator.dart";
+import "package:obni_draw/core/drawable/drawable.dart";
+import "package:obni_draw/core/utils/rect_transform.dart";
+import "package:obni_draw/ui/selected_indicator.dart";
 
-import "drawable/drawable.dart";
-
-class DrawableDisplayZone {
+class DisplayZoneState {
   final List<IDrawable> _allPositionedDrawable = [];
   IDrawable? _selectedDrawable;
 
-  Iterable<Positioned> getPositioned() {
+  Iterable<Widget> getPositioned() {
     return _allPositionedDrawable.map((e) {
       if (e == _selectedDrawable) {
-        return buildSelected(e);
+        return SelectedIndicator(drawable: e);
       } else {
         return _build(e);
       }

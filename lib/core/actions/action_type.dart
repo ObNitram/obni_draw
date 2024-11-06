@@ -1,6 +1,6 @@
 import "package:flutter/widgets.dart";
 
-abstract class DrawableType {
+abstract class ActionType {
   Positioned draw() => Positioned(child: Container());
 
   void onEnable() {}
@@ -12,4 +12,8 @@ abstract class DrawableType {
   void onPointerMove(PointerMoveEvent event) {}
 
   void onPointerUp(PointerUpEvent event) {}
+
+  IconData get icon;
+
+  String get name;
 }

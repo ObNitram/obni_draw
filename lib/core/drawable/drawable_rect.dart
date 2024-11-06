@@ -1,6 +1,6 @@
 import "package:flutter/material.dart";
-import "package:obni_draw/core/transform.dart";
-import "package:obni_draw/ui/drawable/drawable.dart";
+import "package:obni_draw/core/drawable/drawable.dart";
+import "package:obni_draw/core/utils/rect_transform.dart";
 
 class DrawableRect implements IDrawable {
   final RectTransform _position;
