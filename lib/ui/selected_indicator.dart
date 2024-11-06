@@ -1,3 +1,5 @@
+import "dart:math";
+
 import "package:flutter/material.dart";
 import "package:flutter/widgets.dart";
 import "package:obni_draw/core/drawable/drawable.dart";
@@ -8,7 +10,7 @@ const double _indicatorRay = _indicatorSize / 2;
 const double _offSet = 5;
 const Color _color = Color(0xff195dc2);
 
-class SelectedIndicator extends StatelessWidget {
+class SelectedIndicator extends StatefulWidget {
   final IDrawable drawable;
   final Function(RectTransform) onRectTransformUpdated;
   final Function onRectTransformModifyStart;
@@ -22,14 +24,21 @@ class SelectedIndicator extends StatelessWidget {
       required this.onRectTransformModifyEnd});
 
   @override
+  State<SelectedIndicator> createState() => _SelectedIndicatorState();
+}
+
+class _SelectedIndicatorState extends State<SelectedIndicator> {
+  @override
   Widget build(BuildContext context) {
-    RectTransform position = drawable.getPosition();
+    RectTransform position = widget.drawable.getPosition();
 
     return Positioned(
-        left: position.x - _indicatorRay - _offSet,
-        top: position.y - _indicatorRay - _offSet,
-        width: position.width + _indicatorSize + _offSet * 2,
-        height: position.height + _indicatorSize + _offSet * 2,
+        left: position.a.x - _indicatorRay - _offSet,
+        top: position.a.y - _indicatorRay - _offSet,
+        width: max(
+            position.width + _indicatorSize + _offSet * 2, _indicatorSize * 2),
+        height: max(
+            position.height + _indicatorSize + _offSet * 2, _indicatorSize * 2),
         child: Stack(
           children: [
             Positioned(
@@ -37,7 +46,7 @@ class SelectedIndicator extends StatelessWidget {
               top: _indicatorRay + _offSet,
               right: _indicatorRay + _offSet,
               bottom: _indicatorRay + _offSet,
-              child: drawable.draw(),
+              child: widget.drawable.draw(),
             ),
             _getBorderIndicator(),
             ..._getCornerIndicator(),
@@ -57,7 +66,7 @@ class SelectedIndicator extends StatelessWidget {
     );
   }
 
-  List<Positioned> _getCornerIndicator() {
+  List<Widget> _getCornerIndicator() {
     return [
       _buildCornerIndicator(Alignment.topLeft),
       _buildCornerIndicator(Alignment.topRight),
@@ -66,31 +75,25 @@ class SelectedIndicator extends StatelessWidget {
     ];
   }
 
-  Positioned _buildCornerIndicator(Alignment alignment) {
-    return Positioned(
-      left: alignment == Alignment.topLeft || alignment == Alignment.bottomLeft
-          ? 0
-          : null,
-      right:
-          alignment == Alignment.topRight || alignment == Alignment.bottomRight
-              ? 0
-              : null,
-      top: alignment == Alignment.topLeft || alignment == Alignment.topRight
-          ? 0
-          : null,
-      bottom: alignment == Alignment.bottomLeft ||
-              alignment == Alignment.bottomRight
-          ? 0
-          : null,
-      height: _indicatorSize,
-      width: _indicatorSize,
+  Alignment? currentAlignment;
+
+  Widget _buildCornerIndicator(Alignment alignment) {
+    return Align(
+      alignment: alignment,
       child: GestureDetector(
-        onPanStart: (_) => onRectTransformModifyStart(),
-        onPanUpdate: (details) {
-          RectTransform newPosition = _updatePosition(details, alignment);
-          onRectTransformUpdated(newPosition);
+        onPanStart: (_) {
+          widget.onRectTransformModifyStart();
+          setState(() => currentAlignment = alignment);
         },
-        onPanEnd: (_) => onRectTransformModifyEnd(),
+        onPanUpdate: (details) {
+          RectTransform newPosition =
+              _updatePosition(Vec2.fromOffset(details.delta));
+          widget.onRectTransformUpdated(newPosition);
+        },
+        onPanEnd: (_) {
+          widget.onRectTransformModifyEnd();
+          setState(() => currentAlignment = null);
+        },
         child: Container(
           height: _indicatorSize,
           width: _indicatorSize,
@@ -101,36 +104,61 @@ class SelectedIndicator extends StatelessWidget {
     );
   }
 
-  RectTransform _updatePosition(
-      DragUpdateDetails details, Alignment alignment) {
-    RectTransform position = drawable.getPosition();
-    double dx = details.delta.dx;
-    double dy = details.delta.dy;
+  RectTransform _updatePosition(Vec2 delta) {
+    RectTransform position = widget.drawable.getPosition();
 
-    if (alignment == Alignment.topLeft) {
-      return position.copyWith(
-        x: position.x + dx,
-        y: position.y + dy,
-        width: position.width - dx,
-        height: position.height - dy,
-      );
-    } else if (alignment == Alignment.topRight) {
-      return position.copyWith(
-        y: position.y + dy,
-        width: position.width + dx,
-        height: position.height - dy,
-      );
-    } else if (alignment == Alignment.bottomLeft) {
-      return position.copyWith(
-        x: position.x + dx,
-        width: position.width - dx,
-        height: position.height + dy,
-      );
-    } else {
-      return position.copyWith(
-        width: position.width + dx,
-        height: position.height + dy,
-      );
+    switch (currentAlignment) {
+      case Alignment.topLeft:
+        final newPosition = position.copyWith(a: position.a + delta);
+        if (newPosition.a >= newPosition.b) {
+          setState(() => currentAlignment = Alignment.bottomRight);
+        } else if (newPosition.height <= 0) {
+          setState(() => currentAlignment = Alignment.bottomLeft);
+        } else if (newPosition.width <= 0) {
+          setState(() => currentAlignment = Alignment.topRight);
+        }
+        return newPosition;
+
+      case Alignment.topRight:
+        final newPosition = position.copyWith(
+          a: Vec2(position.a.x, position.a.y + delta.y),
+          b: Vec2(position.b.x + delta.x, position.b.y),
+        );
+        if (newPosition.a >= newPosition.b) {
+          setState(() => currentAlignment = Alignment.bottomLeft);
+        } else if (newPosition.height <= 0) {
+          setState(() => currentAlignment = Alignment.bottomRight);
+        } else if (newPosition.width <= 0) {
+          setState(() => currentAlignment = Alignment.topLeft);
+        }
+        return newPosition;
+      case Alignment.bottomLeft:
+        final newPosition = position.copyWith(
+          a: Vec2(position.a.x + delta.x, position.a.y),
+          b: Vec2(position.b.x, position.b.y + delta.y),
+        );
+
+        if (newPosition.a >= newPosition.b) {
+          setState(() => currentAlignment = Alignment.topRight);
+        } else if (newPosition.height <= 0) {
+          setState(() => currentAlignment = Alignment.topLeft);
+        } else if (newPosition.width <= 0) {
+          setState(() => currentAlignment = Alignment.bottomRight);
+        }
+        return newPosition;
+      case Alignment.bottomRight:
+        final newPosition = position.copyWith(b: position.b + delta);
+
+        if (newPosition.a >= newPosition.b) {
+          setState(() => currentAlignment = Alignment.topLeft);
+        } else if (newPosition.height <= 0) {
+          setState(() => currentAlignment = Alignment.topRight);
+        } else if (newPosition.width <= 0) {
+          setState(() => currentAlignment = Alignment.bottomLeft);
+        }
+        return newPosition;
+      default:
+        throw Exception("Invalid alignment");
     }
   }
 }

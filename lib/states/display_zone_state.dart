@@ -50,8 +50,8 @@ class DisplayZoneState {
     RectTransform position = drawable.getPosition();
 
     return Positioned(
-      left: position.x,
-      top: position.y,
+      left: position.a.x,
+      top: position.a.y,
       width: position.width,
       height: position.height,
       child: drawable.draw(),
