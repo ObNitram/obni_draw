@@ -10,8 +10,16 @@ const Color _color = Color(0xff195dc2);
 
 class SelectedIndicator extends StatelessWidget {
   final IDrawable drawable;
+  final Function(RectTransform) onRectTransformUpdated;
+  final Function onRectTransformModifyStart;
+  final Function onRectTransformModifyEnd;
 
-  const SelectedIndicator({super.key, required this.drawable});
+  const SelectedIndicator(
+      {super.key,
+      required this.drawable,
+      required this.onRectTransformUpdated,
+      required this.onRectTransformModifyStart,
+      required this.onRectTransformModifyEnd});
 
   @override
   Widget build(BuildContext context) {
@@ -50,38 +58,79 @@ class SelectedIndicator extends StatelessWidget {
   }
 
   List<Positioned> _getCornerIndicator() {
-    final indicator = Container(
+    return [
+      _buildCornerIndicator(Alignment.topLeft),
+      _buildCornerIndicator(Alignment.topRight),
+      _buildCornerIndicator(Alignment.bottomLeft),
+      _buildCornerIndicator(Alignment.bottomRight),
+    ];
+  }
+
+  Positioned _buildCornerIndicator(Alignment alignment) {
+    return Positioned(
+      left: alignment == Alignment.topLeft || alignment == Alignment.bottomLeft
+          ? 0
+          : null,
+      right:
+          alignment == Alignment.topRight || alignment == Alignment.bottomRight
+              ? 0
+              : null,
+      top: alignment == Alignment.topLeft || alignment == Alignment.topRight
+          ? 0
+          : null,
+      bottom: alignment == Alignment.bottomLeft ||
+              alignment == Alignment.bottomRight
+          ? 0
+          : null,
       height: _indicatorSize,
       width: _indicatorSize,
-      decoration:
-          BoxDecoration(color: _color, borderRadius: BorderRadius.circular(3)),
+      child: GestureDetector(
+        onPanStart: (_) => onRectTransformModifyStart(),
+        onPanUpdate: (details) {
+          RectTransform newPosition = _updatePosition(details, alignment);
+          onRectTransformUpdated(newPosition);
+        },
+        onPanEnd: (_) => onRectTransformModifyEnd(),
+        child: Container(
+          height: _indicatorSize,
+          width: _indicatorSize,
+          decoration: BoxDecoration(
+              color: _color, borderRadius: BorderRadius.circular(3)),
+        ),
+      ),
     );
+  }
 
-    return [
-      Positioned(
-          left: 0,
-          top: 0,
-          height: _indicatorSize,
-          width: _indicatorSize,
-          child: indicator),
-      Positioned(
-          right: 0,
-          top: 0,
-          height: _indicatorSize,
-          width: _indicatorSize,
-          child: indicator),
-      Positioned(
-          left: 0,
-          bottom: 0,
-          height: _indicatorSize,
-          width: _indicatorSize,
-          child: indicator),
-      Positioned(
-          right: 0,
-          bottom: 0,
-          height: _indicatorSize,
-          width: _indicatorSize,
-          child: indicator),
-    ];
+  RectTransform _updatePosition(
+      DragUpdateDetails details, Alignment alignment) {
+    RectTransform position = drawable.getPosition();
+    double dx = details.delta.dx;
+    double dy = details.delta.dy;
+
+    if (alignment == Alignment.topLeft) {
+      return position.copyWith(
+        x: position.x + dx,
+        y: position.y + dy,
+        width: position.width - dx,
+        height: position.height - dy,
+      );
+    } else if (alignment == Alignment.topRight) {
+      return position.copyWith(
+        y: position.y + dy,
+        width: position.width + dx,
+        height: position.height - dy,
+      );
+    } else if (alignment == Alignment.bottomLeft) {
+      return position.copyWith(
+        x: position.x + dx,
+        width: position.width - dx,
+        height: position.height + dy,
+      );
+    } else {
+      return position.copyWith(
+        width: position.width + dx,
+        height: position.height + dy,
+      );
+    }
   }
 }

@@ -3,7 +3,7 @@ import "package:obni_draw/core/drawable/drawable.dart";
 import "package:obni_draw/core/utils/rect_transform.dart";
 
 class DrawableRect implements IDrawable {
-  final RectTransform _position;
+  RectTransform _position;
   final Color _borderColor;
   final Color _backgroundColor;
   final double _radius;
@@ -35,5 +35,10 @@ class DrawableRect implements IDrawable {
   @override
   RectTransform getPosition() {
     return _position;
+  }
+
+  @override
+  void setPosition(RectTransform rectTransform) {
+    _position = rectTransform;
   }
 }

@@ -8,10 +8,17 @@ class DisplayZoneState {
   final List<IDrawable> _allPositionedDrawable = [];
   IDrawable? _selectedDrawable;
 
+  bool isMovingSelected = false;
+
   Iterable<Widget> getPositioned() {
     return _allPositionedDrawable.map((e) {
       if (e == _selectedDrawable) {
-        return SelectedIndicator(drawable: e);
+        return SelectedIndicator(
+          drawable: e,
+          onRectTransformModifyStart: () => isMovingSelected = true,
+          onRectTransformUpdated: e.setPosition,
+          onRectTransformModifyEnd: () => isMovingSelected = false,
+        );
       } else {
         return _build(e);
       }
@@ -23,6 +30,8 @@ class DisplayZoneState {
   }
 
   void select(Offset position) {
+    if (isMovingSelected) return;
+
     for (var e in _allPositionedDrawable.reversed) {
       if (e.getPosition().containsOffset(position)) {
         _selectedDrawable = e;

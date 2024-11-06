@@ -2,13 +2,14 @@ import "dart:math";
 
 import "package:flutter/widgets.dart";
 
-class RectTransform {
+final class RectTransform {
   final double x;
   final double y;
   final double width;
   final double height;
 
   double get xWidth => x + width;
+
   double get yHeight => y + height;
 
   const RectTransform({
@@ -23,6 +24,20 @@ class RectTransform {
         y = min(startPosition.dy, endPosition.dy),
         width = (startPosition.dx - endPosition.dx).abs(),
         height = (startPosition.dy - endPosition.dy).abs();
+
+  RectTransform copyWith({
+    double? x,
+    double? y,
+    double? width,
+    double? height,
+  }) {
+    return RectTransform(
+      x: x ?? this.x,
+      y: y ?? this.y,
+      width: width ?? this.width,
+      height: height ?? this.height,
+    );
+  }
 
   static const RectTransform zero =
       RectTransform(x: 0, y: 0, width: 0, height: 0);

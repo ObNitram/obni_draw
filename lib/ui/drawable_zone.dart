@@ -45,7 +45,6 @@ class _DrawableZoneState extends State<DrawableZone> {
   @override
   Widget build(BuildContext context) {
     return Listener(
-        behavior: HitTestBehavior.translucent,
         onPointerDown: (event) {
           setState(() =>
               _drawableTypeState.currentDrawableType.onPointerDown(event));

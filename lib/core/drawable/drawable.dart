@@ -5,4 +5,6 @@ abstract interface class IDrawable {
   Widget draw();
 
   RectTransform getPosition();
+
+  void setPosition(RectTransform rectTransform);
 }
