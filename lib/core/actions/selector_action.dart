@@ -15,7 +15,7 @@ class Selector extends ActionType {
   }
 
   @override
-  void onPointerUp(PointerUpEvent event) {
+  void onPointerUp(event) {
     _displayZoneState.select(event.localPosition);
   }
 

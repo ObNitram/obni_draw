@@ -51,9 +51,13 @@ final class RectTransform {
 
   const RectTransform({required this.a, required this.b}) : assert(a <= b);
 
-  RectTransform.fromOffset(Offset a, Offset b)
-      : a = Vec2(a.dx, a.dy),
-        b = Vec2(b.dx, b.dy);
+  RectTransform.fromValue(
+      {required double ax,
+      required double ay,
+      required double bx,
+      required double by})
+      : a = Vec2(min(ax, bx), min(ay, by)),
+        b = Vec2(max(ax, bx), max(ay, by));
 
   RectTransform copyWith({
     Vec2? a,

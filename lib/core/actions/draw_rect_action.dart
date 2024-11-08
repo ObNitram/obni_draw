@@ -34,9 +34,24 @@ class DrawableRectAction extends ActionType {
         _name = name;
 
   @override
+  void onEnable() {
+    _startPosition = Offset.zero;
+    _currentPosition = Offset.zero;
+  }
+
+  @override
+  void onDisable() {
+    _startPosition = Offset.zero;
+    _currentPosition = Offset.zero;
+  }
+
+  @override
   Positioned draw() {
-    RectTransform rect =
-        RectTransform.fromOffset(_startPosition, _currentPosition);
+    RectTransform rect = RectTransform.fromValue(
+        ax: _startPosition.dx,
+        ay: _startPosition.dy,
+        bx: _currentPosition.dx,
+        by: _currentPosition.dy);
 
     if (rect.area < minAreaToDisplay) {
       return Positioned(child: Container());
@@ -52,22 +67,27 @@ class DrawableRectAction extends ActionType {
   }
 
   @override
-  void onPointerDown(PointerDownEvent event) {
+  void onPointerDown(event) {
     _startPosition = event.localPosition;
     _currentPosition = event.localPosition;
   }
 
   @override
-  void onPointerMove(PointerMoveEvent event) {
+  void onPointerMove(event) {
     _currentPosition = event.localPosition;
   }
 
   @override
-  void onPointerUp(PointerUpEvent event) {
+  void onPointerUp(event) {
     _currentPosition = event.localPosition;
 
-    if (RectTransform.fromOffset(_startPosition, _currentPosition).area <
-        minAreaToDisplay) {
+    final rectTransform = RectTransform.fromValue(
+        ax: _startPosition.dx,
+        ay: _startPosition.dy,
+        bx: _currentPosition.dx,
+        by: _currentPosition.dy);
+
+    if (rectTransform.area < minAreaToDisplay) {
       _startPosition = Offset.zero;
       _currentPosition = Offset.zero;
       return;
@@ -78,7 +98,12 @@ class DrawableRectAction extends ActionType {
 
   void createDrawable() {
     _displayZoneState.add(DrawableRect(
-        position: RectTransform.fromOffset(_startPosition, _currentPosition),
+        position: RectTransform.fromValue(
+          ax: _startPosition.dx,
+          ay: _startPosition.dy,
+          bx: _currentPosition.dx,
+          by: _currentPosition.dy,
+        ),
         borderColor: _borderColor,
         backgroundColor: _backgroundColor,
         radius: _radius));

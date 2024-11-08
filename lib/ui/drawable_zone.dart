@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "package:obni_draw/core/actions/draw_rect_action.dart";
 import "package:obni_draw/core/actions/selector_action.dart";
+import "package:obni_draw/core/utils/rect_transform.dart";
 
 import "package:obni_draw/states/display_zone_state.dart";
 import "package:obni_draw/ui/actions_bar.dart";
@@ -14,12 +15,18 @@ class DrawableZone extends StatefulWidget {
 }
 
 class _DrawableZoneState extends State<DrawableZone> {
-  final DisplayZoneState _displayZoneState = DisplayZoneState();
+  late DisplayZoneState _displayZoneState;
   late ActionsState _drawableTypeState;
+
+  final Vec2 _position = const Vec2(0, 0);
+  final double _scale = 1;
 
   @override
   void initState() {
     super.initState();
+    _displayZoneState =
+        DisplayZoneState(notifyListeners: () => setState(() {}));
+
     _drawableTypeState = ActionsState(
       allDrawableType: [
         Selector(drawableDisplayZone: _displayZoneState),
@@ -44,24 +51,24 @@ class _DrawableZoneState extends State<DrawableZone> {
 
   @override
   Widget build(BuildContext context) {
-    return Listener(
-        onPointerDown: (event) {
+    return GestureDetector(
+        onPanStart: (event) {
           setState(() =>
               _drawableTypeState.currentDrawableType.onPointerDown(event));
         },
-        onPointerMove: (event) {
+        onPanUpdate: (event) {
           setState(() =>
               _drawableTypeState.currentDrawableType.onPointerMove(event));
         },
-        onPointerUp: (event) {
+        onPanEnd: (event) {
           setState(
               () => _drawableTypeState.currentDrawableType.onPointerUp(event));
         },
         child: Container(
-            color: const Color(0xFFEBEBEB),
+            color: const Color(0xFFFFFFFF),
             child: Stack(
               children: [
-                ..._displayZoneState.getPositioned(),
+                ..._displayZoneState.getPositioned(_scale, _position),
                 _drawableTypeState.currentDrawableType.draw(),
                 Padding(
                   padding: const EdgeInsets.all(12.0),

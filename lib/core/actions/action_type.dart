@@ -7,11 +7,11 @@ abstract class ActionType {
 
   void onDisable() {}
 
-  void onPointerDown(PointerDownEvent event) {}
+  void onPointerDown(DragStartDetails event) {}
 
-  void onPointerMove(PointerMoveEvent event) {}
+  void onPointerMove(DragUpdateDetails event) {}
 
-  void onPointerUp(PointerUpEvent event) {}
+  void onPointerUp(DragEndDetails event) {}
 
   IconData get icon;
 

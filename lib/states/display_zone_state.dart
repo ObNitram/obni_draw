@@ -6,23 +6,28 @@ import "package:obni_draw/ui/selected_indicator.dart";
 
 class DisplayZoneState {
   final List<IDrawable> _allPositionedDrawable = [];
-  IDrawable? _selectedDrawable;
+  Set<IDrawable> _selectedDrawable = {};
 
-  bool isMovingSelected = false;
+  final Function() notifyListeners;
 
-  Iterable<Widget> getPositioned() {
-    return _allPositionedDrawable.map((e) {
-      if (e == _selectedDrawable) {
-        return SelectedIndicator(
+  DisplayZoneState({required this.notifyListeners});
+
+  Iterable<Widget> getPositioned(double scale, Vec2 position) {
+    List<Widget> tmp = [];
+
+    tmp.addAll(_allPositionedDrawable.map((e) {
+      return _build(e, scale, position);
+    }));
+
+    tmp.addAll(_selectedDrawable.map((e) => SelectedIndicator(
           drawable: e,
-          onRectTransformModifyStart: () => isMovingSelected = true,
-          onRectTransformUpdated: e.setPosition,
-          onRectTransformModifyEnd: () => isMovingSelected = false,
-        );
-      } else {
-        return _build(e);
-      }
-    });
+          onRectTransformUpdated: (rectTransform) {
+            e.setPosition(rectTransform);
+            notifyListeners();
+          },
+        )));
+
+    return tmp;
   }
 
   void add(IDrawable drawableHandler) {
@@ -30,30 +35,32 @@ class DisplayZoneState {
   }
 
   void select(Offset position) {
-    if (isMovingSelected) return;
-
     for (var e in _allPositionedDrawable.reversed) {
       if (e.getPosition().containsOffset(position)) {
-        _selectedDrawable = e;
+        _selectedDrawable.add(e);
         return;
       }
     }
 
-    _selectedDrawable = null;
+    _selectedDrawable = {};
   }
 
   void deselect() {
-    _selectedDrawable = null;
+    _selectedDrawable = {};
   }
 
-  Positioned _build(IDrawable drawable) {
-    RectTransform position = drawable.getPosition();
+  Positioned _build(IDrawable drawable, double scale, Vec2 position) {
+    RectTransform rect = drawable.getPosition();
+    double left = (rect.a.x + position.x) * scale;
+    double top = (rect.a.y + position.y) * scale;
+    double width = rect.width * scale;
+    double height = rect.height * scale;
 
     return Positioned(
-      left: position.a.x,
-      top: position.a.y,
-      width: position.width,
-      height: position.height,
+      left: left,
+      top: top,
+      width: width,
+      height: height,
       child: drawable.draw(),
     );
   }

@@ -13,15 +13,12 @@ const Color _color = Color(0xff195dc2);
 class SelectedIndicator extends StatefulWidget {
   final IDrawable drawable;
   final Function(RectTransform) onRectTransformUpdated;
-  final Function onRectTransformModifyStart;
-  final Function onRectTransformModifyEnd;
 
-  const SelectedIndicator(
-      {super.key,
-      required this.drawable,
-      required this.onRectTransformUpdated,
-      required this.onRectTransformModifyStart,
-      required this.onRectTransformModifyEnd});
+  const SelectedIndicator({
+    super.key,
+    required this.drawable,
+    required this.onRectTransformUpdated,
+  });
 
   @override
   State<SelectedIndicator> createState() => _SelectedIndicatorState();
@@ -82,7 +79,6 @@ class _SelectedIndicatorState extends State<SelectedIndicator> {
       alignment: alignment,
       child: GestureDetector(
         onPanStart: (_) {
-          widget.onRectTransformModifyStart();
           setState(() => currentAlignment = alignment);
         },
         onPanUpdate: (details) {
@@ -91,7 +87,6 @@ class _SelectedIndicatorState extends State<SelectedIndicator> {
           widget.onRectTransformUpdated(newPosition);
         },
         onPanEnd: (_) {
-          widget.onRectTransformModifyEnd();
           setState(() => currentAlignment = null);
         },
         child: Container(
