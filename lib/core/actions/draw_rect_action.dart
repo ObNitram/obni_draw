@@ -14,8 +14,8 @@ class DrawableRectAction extends ActionType {
   final IconData _iconData;
   final String _name;
 
-  Offset _startPosition = Offset.zero;
-  Offset _currentPosition = Offset.zero;
+  Vec2 _startPosition = Vec2.zero;
+  Vec2 _currentPosition = Vec2.zero;
 
   static const double minAreaToDisplay = 0.2;
 
@@ -35,23 +35,20 @@ class DrawableRectAction extends ActionType {
 
   @override
   void onEnable() {
-    _startPosition = Offset.zero;
-    _currentPosition = Offset.zero;
+    _startPosition = Vec2.zero;
+    _currentPosition = Vec2.zero;
   }
 
   @override
   void onDisable() {
-    _startPosition = Offset.zero;
-    _currentPosition = Offset.zero;
+    _startPosition = Vec2.zero;
+    _currentPosition = Vec2.zero;
   }
 
   @override
   Positioned draw() {
-    RectTransform rect = RectTransform.fromValue(
-        ax: _startPosition.dx,
-        ay: _startPosition.dy,
-        bx: _currentPosition.dx,
-        by: _currentPosition.dy);
+    RectTransform rect =
+        RectTransform.fromPoint(_startPosition, _currentPosition);
 
     if (rect.area < minAreaToDisplay) {
       return Positioned(child: Container());
@@ -67,43 +64,35 @@ class DrawableRectAction extends ActionType {
   }
 
   @override
-  void onPointerDown(event) {
-    _startPosition = event.localPosition;
-    _currentPosition = event.localPosition;
+  void onPointerDown(event, offset) {
+    _startPosition = event.localPosition.toVec2();
+    _currentPosition = event.localPosition.toVec2();
   }
 
   @override
-  void onPointerMove(event) {
-    _currentPosition = event.localPosition;
+  void onPointerMove(event, offset) {
+    _currentPosition = event.localPosition.toVec2();
   }
 
   @override
-  void onPointerUp(event) {
-    _currentPosition = event.localPosition;
+  void onPointerUp(event, offset) {
+    _currentPosition = event.localPosition.toVec2();
 
-    final rectTransform = RectTransform.fromValue(
-        ax: _startPosition.dx,
-        ay: _startPosition.dy,
-        bx: _currentPosition.dx,
-        by: _currentPosition.dy);
+    final rectTransform =
+        RectTransform.fromPoint(_startPosition, _currentPosition);
 
     if (rectTransform.area < minAreaToDisplay) {
-      _startPosition = Offset.zero;
-      _currentPosition = Offset.zero;
+      _startPosition = Vec2.zero;
+      _currentPosition = Vec2.zero;
       return;
     }
 
-    createDrawable();
+    createDrawable(rectTransform.copyWithOffset(-offset));
   }
 
-  void createDrawable() {
+  void createDrawable(RectTransform transform) {
     _displayZoneState.add(DrawableRect(
-        position: RectTransform.fromValue(
-          ax: _startPosition.dx,
-          ay: _startPosition.dy,
-          bx: _currentPosition.dx,
-          by: _currentPosition.dy,
-        ),
+        position: transform,
         borderColor: _borderColor,
         backgroundColor: _backgroundColor,
         radius: _radius));

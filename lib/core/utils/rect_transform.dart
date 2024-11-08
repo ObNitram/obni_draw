@@ -2,113 +2,113 @@ import "dart:math";
 
 import "package:flutter/widgets.dart";
 
+extension Vec2Extension on Offset {
+  Vec2 toVec2() => Vec2(dx, dy);
+}
+
 final class Vec2 {
   final double x;
   final double y;
 
   const Vec2(this.x, this.y);
 
+  static const zero = Vec2(0, 0);
+
   Vec2.fromOffset(Offset offset)
       : x = offset.dx,
         y = offset.dy;
 
-  Vec2 operator +(Vec2 other) {
-    return Vec2(x + other.x, y + other.y);
-  }
+  Vec2 operator +(Vec2 other) => Vec2(x + other.x, y + other.y);
 
-  Vec2 operator -(Vec2 other) {
-    return Vec2(x - other.x, y - other.y);
-  }
+  Vec2 operator -(Vec2 other) => Vec2(x - other.x, y - other.y);
 
-  bool operator <(Vec2 other) {
-    return x < other.x && y < other.y;
-  }
+  Vec2 operator -() => Vec2(-x, -y);
 
-  bool operator >(Vec2 other) {
-    return x > other.x && y > other.y;
-  }
+  bool operator <(Vec2 other) => (x < other.x && y < other.y);
 
-  bool operator <=(Vec2 other) {
-    return x <= other.x && y <= other.y;
-  }
+  bool operator >(Vec2 other) => (x > other.x && y > other.y);
 
-  bool operator >=(Vec2 other) {
-    return x >= other.x && y >= other.y;
-  }
+  bool operator <=(Vec2 other) => (x <= other.x && y <= other.y);
 
-  double magnitude() {
-    return sqrt(x * x + y * y);
-  }
+  bool operator >=(Vec2 other) => (x >= other.x && y >= other.y);
+
+  double get magnitudeSquared => (x * x + y * y);
+
+  double get magnitude => sqrt(magnitudeSquared);
 }
 
 final class RectTransform {
-  final Vec2 a;
-  final Vec2 b;
+  final Vec2 topLeft;
+  final Vec2 bottomRight;
 
-  double get width => b.x - a.x;
+  double get width => bottomRight.x - topLeft.x;
 
-  double get height => b.y - a.y;
+  double get height => bottomRight.y - topLeft.y;
 
-  const RectTransform({required this.a, required this.b}) : assert(a <= b);
+  RectTransform({required this.topLeft, required this.bottomRight})
+      : assert(topLeft <= bottomRight);
 
-  RectTransform.fromValue(
-      {required double ax,
-      required double ay,
-      required double bx,
-      required double by})
-      : a = Vec2(min(ax, bx), min(ay, by)),
-        b = Vec2(max(ax, bx), max(ay, by));
+  RectTransform.fromPoint(Vec2 a, Vec2 b)
+      : topLeft = Vec2(min(a.x, b.x), min(a.y, b.y)),
+        bottomRight = Vec2(max(a.x, b.x), max(a.y, b.y));
 
-  RectTransform copyWith({
-    Vec2? a,
-    Vec2? b,
-  }) {
-    Vec2 newA = a ?? this.a;
-    Vec2 newB = b ?? this.b;
+  RectTransform copyWith({double? ax, double? ay, double? bx, double? by}) =>
+      RectTransform.fromPoint(
+        Vec2(ax ?? topLeft.x, ay ?? topLeft.y),
+        Vec2(bx ?? bottomRight.x, by ?? bottomRight.y),
+      );
 
-    if (!(newA <= newB)) {
-      newA = Vec2(min(newA.x, newB.x), min(newA.y, newB.y));
-      newB = Vec2(max(newA.x, newB.x), max(newA.y, newB.y));
-    }
-
+  RectTransform copyWithOffset(Vec2 offset) {
     return RectTransform(
-      a: newA,
-      b: newB,
-    );
+        topLeft: topLeft + offset, bottomRight: bottomRight + offset);
   }
 
-  static final RectTransform zero = RectTransform(
-    a: Vec2(0, 0),
-    b: Vec2(0, 0),
-  );
+  static final RectTransform zero =
+      RectTransform(topLeft: Vec2.zero, bottomRight: Vec2.zero);
 
   Positioned toPositioned({required Widget child}) {
-    assert(a <= b);
+    assert(topLeft <= bottomRight);
     return Positioned(
-      left: a.x,
-      top: a.y,
+      left: topLeft.x,
+      top: topLeft.y,
       width: width,
       height: height,
       child: child,
     );
   }
 
-  double get area => width * height;
+  double get area {
+    var a = width * height;
+    assert(a >= 0);
+    return a;
+  }
 
   bool containsOffset(Offset offset) {
-    final bool withinX = offset.dx >= a.x && offset.dx <= b.x;
-    final bool withinY = offset.dy >= a.y && offset.dy <= b.y;
+    final bool withinX = offset.dx >= topLeft.x && offset.dx <= bottomRight.x;
+    final bool withinY = offset.dy >= topLeft.y && offset.dy <= bottomRight.y;
+    return withinX && withinY;
+  }
+
+  bool containsVec2(Vec2 vec) {
+    final bool withinX = vec.x >= topLeft.x && vec.x <= bottomRight.x;
+    final bool withinY = vec.y >= topLeft.y && vec.y <= bottomRight.y;
     return withinX && withinY;
   }
 
   bool intersects(RectTransform other) {
-    final bool noOverlapX = other.b.x < a.x || other.a.x > b.x;
-    final bool noOverlapY = other.b.y < a.y || other.a.y > b.y;
+    final bool noOverlapX =
+        other.bottomRight.x < topLeft.x || other.topLeft.x > bottomRight.x;
+    final bool noOverlapY =
+        other.bottomRight.y < topLeft.y || other.topLeft.y > bottomRight.y;
     return !(noOverlapX || noOverlapY);
+  }
+
+  bool contains(RectTransform other) {
+    return containsVec2(other.topLeft) && containsVec2(other.bottomRight);
   }
 
   @override
   String toString() {
-    return "RectTransform(a: $a, b: $b, width: $width, height: $height)";
+    return "RectTransform(a: $topLeft, b: $bottomRight, width: $width, height: $height)";
   }
 }

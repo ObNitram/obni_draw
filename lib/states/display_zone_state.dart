@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:flutter/widgets.dart";
+
 import "package:obni_draw/core/drawable/drawable.dart";
 import "package:obni_draw/core/utils/rect_transform.dart";
 import "package:obni_draw/ui/selected_indicator.dart";
@@ -21,6 +22,7 @@ class DisplayZoneState {
 
     tmp.addAll(_selectedDrawable.map((e) => SelectedIndicator(
           drawable: e,
+          offset: position,
           onRectTransformUpdated: (rectTransform) {
             e.setPosition(rectTransform);
             notifyListeners();
@@ -34,25 +36,22 @@ class DisplayZoneState {
     _allPositionedDrawable.add(drawableHandler);
   }
 
-  void select(Offset position) {
-    for (var e in _allPositionedDrawable.reversed) {
-      if (e.getPosition().containsOffset(position)) {
-        _selectedDrawable.add(e);
-        return;
-      }
-    }
-
-    _selectedDrawable = {};
+  void select(Iterable<IDrawable> list) {
+    _selectedDrawable.addAll(list);
   }
 
-  void deselect() {
+  void deselect(Iterable<IDrawable> list) {
+    _selectedDrawable.removeAll(list);
+  }
+
+  void deselectAll() {
     _selectedDrawable = {};
   }
 
   Positioned _build(IDrawable drawable, double scale, Vec2 position) {
     RectTransform rect = drawable.getPosition();
-    double left = (rect.a.x + position.x) * scale;
-    double top = (rect.a.y + position.y) * scale;
+    double left = (rect.topLeft.x + position.x) * scale;
+    double top = (rect.topLeft.y + position.y) * scale;
     double width = rect.width * scale;
     double height = rect.height * scale;
 
@@ -63,5 +62,29 @@ class DisplayZoneState {
       height: height,
       child: drawable.draw(),
     );
+  }
+
+  Iterable<IDrawable> getDrawableInRect(RectTransform transform) {
+    List<IDrawable> list = [];
+
+    for (var drawable in _allPositionedDrawable) {
+      if (transform.contains(drawable.getPosition())) {
+        list.add(drawable);
+      }
+    }
+
+    return list;
+  }
+
+  Iterable<IDrawable> getDrawableOnPosition(Vec2 position) {
+    List<IDrawable> list = [];
+
+    for (var drawable in _allPositionedDrawable) {
+      if (drawable.getPosition().containsVec2(position)) {
+        list.add(drawable);
+      }
+    }
+
+    return list;
   }
 }

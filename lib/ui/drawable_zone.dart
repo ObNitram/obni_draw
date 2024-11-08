@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:obni_draw/core/actions/draw_rect_action.dart";
+import "package:obni_draw/core/actions/move_action.dart";
 import "package:obni_draw/core/actions/selector_action.dart";
 import "package:obni_draw/core/utils/rect_transform.dart";
 
@@ -18,7 +19,7 @@ class _DrawableZoneState extends State<DrawableZone> {
   late DisplayZoneState _displayZoneState;
   late ActionsState _drawableTypeState;
 
-  final Vec2 _position = const Vec2(0, 0);
+  Vec2 _position = Vec2.zero;
   final double _scale = 1;
 
   @override
@@ -29,6 +30,10 @@ class _DrawableZoneState extends State<DrawableZone> {
 
     _drawableTypeState = ActionsState(
       allDrawableType: [
+        MoveAction(
+            onMove: (delta) => setState(() {
+                  _position += delta;
+                })),
         Selector(drawableDisplayZone: _displayZoneState),
         DrawableRectAction(
             displayZoneState: _displayZoneState,
@@ -53,16 +58,18 @@ class _DrawableZoneState extends State<DrawableZone> {
   Widget build(BuildContext context) {
     return GestureDetector(
         onPanStart: (event) {
-          setState(() =>
-              _drawableTypeState.currentDrawableType.onPointerDown(event));
+          _drawableTypeState.currentDrawableType
+              .onPointerDown(event, _position);
+          setState(() => {});
         },
         onPanUpdate: (event) {
-          setState(() =>
-              _drawableTypeState.currentDrawableType.onPointerMove(event));
+          _drawableTypeState.currentDrawableType
+              .onPointerMove(event, _position);
+          setState(() => {});
         },
         onPanEnd: (event) {
-          setState(
-              () => _drawableTypeState.currentDrawableType.onPointerUp(event));
+          _drawableTypeState.currentDrawableType.onPointerUp(event, _position);
+          setState(() => {});
         },
         child: Container(
             color: const Color(0xFFFFFFFF),

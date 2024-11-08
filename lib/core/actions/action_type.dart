@@ -1,4 +1,5 @@
 import "package:flutter/widgets.dart";
+import "package:obni_draw/core/utils/rect_transform.dart";
 
 abstract class ActionType {
   Positioned draw() => Positioned(child: Container());
@@ -7,11 +8,11 @@ abstract class ActionType {
 
   void onDisable() {}
 
-  void onPointerDown(DragStartDetails event) {}
+  void onPointerDown(DragStartDetails event, Vec2 offset) {}
 
-  void onPointerMove(DragUpdateDetails event) {}
+  void onPointerMove(DragUpdateDetails event, Vec2 offset) {}
 
-  void onPointerUp(DragEndDetails event) {}
+  void onPointerUp(DragEndDetails event, Vec2 offset) {}
 
   IconData get icon;
 
