@@ -6,8 +6,7 @@ void main() {
   group("RectTransform copyWith", () {
     test("should copy with new values", () {
       final rect = RectTransform(topLeft: Vec2(1, 2), bottomRight: Vec2(3, 4));
-      final newRect =
-          rect.copyWith(topLeft: Vec2(2, 3), bottomRight: Vec2(4, 5));
+      final newRect = rect.copyWith(ax: 2, ay: 3, bx: 4, by: 5);
 
       expect(newRect.topLeft.x, 2);
       expect(newRect.topLeft.y, 3);

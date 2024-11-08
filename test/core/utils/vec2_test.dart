@@ -63,21 +63,21 @@ void main() {
   group("Vec2 magnitude", () {
     test("should calculate the magnitude of a vector", () {
       final vec = Vec2(3, 4);
-      final result = vec.magnitude();
+      final result = vec.magnitude;
 
       expect(result, 5);
     });
 
     test("should calculate the magnitude of a negative vector", () {
       final vec = Vec2(-3, -4);
-      final result = vec.magnitude();
+      final result = vec.magnitude;
 
       expect(result, 5);
     });
 
     test("should calculate the magnitude of a zero vector", () {
       final vec = Vec2(0, 0);
-      final result = vec.magnitude();
+      final result = vec.magnitude;
 
       expect(result, 0);
     });
